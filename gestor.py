@@ -67,7 +67,6 @@ while True:
         while True:
             print("Para sair do programa digite SAIR")
             print("Por favor, informe o nome do item que deseja cadastrar")
-            
             codigo_compra = input("")
             if codigo_compra.upper() == "SAIR":
                 break
