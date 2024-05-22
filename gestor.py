@@ -10,6 +10,7 @@ gestor_ifood_db = client["gestor_ifood"] #conecta a database gestor_ifood
 compras = gestor_ifood_db.compras #conecta a collection compras
 estoque = gestor_ifood_db.estoque #conecta a collectio estoque
 saidas = gestor_ifood_db.saidas #conecta a collection saidas
+perdas = gestor_ifood_db.perdas #conecta a collection perdas
 
 def get_latest_item_id():
     itens = estoque.find()
@@ -28,7 +29,7 @@ def get_latest_compra_id():
             ultimo_codigo = item["codigo_compra"]
     return ultimo_codigo
 
-def search_stock_by_codigo(codigo_produto):
+def search_stock_by_codigo(codigo_produto: int) -> list:
     return estoque.find_one({"codigo": codigo_produto})
 
 def read_and_display_stock():
@@ -73,19 +74,16 @@ while True:
 
             print("Você deseja armazenar esse item em G ou UN?")
             measure = input("").upper()
-            codigo = get_latest_item_id()
-            codigo +=1
-      
+            codigo = get_latest_item_id() + 1
             print("Por favor, informe a quantidade do item. Ex.: 100, 2150")
-            quantidade = input("")
-            quantidade = int(quantidade)
-            document = {"codigo":codigo, "nome": codigo_compra, "quantidade": quantidade, "unidade_medida": measure, "custo": " ",\
-                        "data_ultima_compra": " ", "codigo_ultima_compra": " "}
-            inserted_id = estoque.insert_one(document).inserted_id
+            quantidade = int(input(""))
+            estoque.insert_one({"codigo":codigo, "nome": codigo_compra, "quantidade": quantidade, "unidade_medida": measure, "custo": " ",\
+                        "data_ultima_compra": " ", "codigo_ultima_compra": " "})
             print("\nInserção realizada com sucesso!")
-            print(inserted_id)
+
 
     elif choice == "3":
+        os.system("cls")
         print("Por favor, escolha uma opção")
         print("1 - Criar saídas")
         print("2 - Alterar saídas")
@@ -131,10 +129,14 @@ while True:
             codigo_venda_ifood = input("")
             saida = saidas.find({"codigo_venda_ifood": codigo_venda_ifood})
             columns = ["codigo_venda_ifood", ]
+            saida_response = []
             for doc in saida:
-                print("codigos_item_saida: ")
-                for chave, valor in doc["codigos_item_saida"].items():
-                    print("codigo_item:",chave,"Quantidade:",valor)
+                if doc:
+                    print("codigos_item_saida: ")
+                    for chave, valor in doc["codigos_item_saida"].items():
+                        print("codigo_item:",chave,"Quantidade:",valor)
+                else:
+                    break
             print("\nPor favor, informe o código do item que deseja alterar")
             codigo_item = input("\n")
             print("Informe a quantidade que deseja inserir")
@@ -280,3 +282,60 @@ while True:
             data_frame = pd.DataFrame(dataset, columns=columns)
             print(data_frame.to_string())
             input("Digite qualquer coisa para sair")
+        
+    elif choice == "5":
+        os.system("cls")
+        print("Digite 'estoque' para mostrar o estoque.")
+        print("Por favor informe o código do item: ")
+        codigo_item = input("")
+        
+        while codigo_item == "estoque":
+            os.system("cls")
+            read_and_display_stock()
+            print("Digite 'estoque' para mostrar o estoque.")
+            print("Por favor informe o código do item: ")
+            codigo_item = input("")
+        os.system("cls")
+        perda = perdas.find({"codigo_item":codigo_item})
+        lista_perdas = []
+        for x in perda:
+            lista_perdas.append(x)
+
+        if lista_perdas:
+            print("Código encontrado!!")
+            print("Informe a data da perda (Ex.: 17/05/2024): ")
+            data = input("")
+            datas_encontradas =[]
+            for x in lista_perdas[0]["perdas"]:
+                datas_encontradas.append(x)
+
+            if data in datas_encontradas:
+                print("Data encontrada!!")
+                print("Informe a quantidade perdida: ")
+                quantidade = int(input(""))
+                perdas.update_one({"codigo_item":codigo_item}, {"$inc":{f"perdas.{data}": quantidade}})
+                os.system("cls")
+                print("Perda cadastrada!")
+                input("Digite qualquer coisa para sair")
+            else:
+                print("Data não encontrada!!")
+                print("Informe a quantidade perdida: ")
+                quantidade = int(input(""))
+                perdas.update_one({"codigo_item":codigo_item}, {"$set":{f"perdas.{data}": quantidade}})
+                os.system("cls")
+                print("Perda cadastrada!")
+                input("Digite qualquer coisa para sair")
+        else:
+            print("Código não encontrado")
+            print("Informe a data da perda (Ex.: 17/05/2024): ")
+            data = input("")
+            print("Informe a quantidade perdida: ")
+            quantidade = int(input(""))
+            item = search_stock_by_codigo(int(codigo_item))
+            nome = item["nome"]
+            document = {"codigo_item":codigo_item, "nome": nome, "perdas":{data:quantidade}}
+            perdas.insert_one(document)
+            os.system("cls")
+            print("Perda cadastrada!")
+            input("Digite qualquer coisa para sair")
+
