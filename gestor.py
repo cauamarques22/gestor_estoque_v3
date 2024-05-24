@@ -129,7 +129,35 @@ class SaidaEstoque(GlobalFunctions):
             documento["codigos_item_saida"][codigo] = quantidade
             
     def alterar_saidas(self):
-        ...
+        Q1 = "Digite o código da venda Ifood"
+        Q2 = "Por favor, informe o código do item que deseja alterar"
+        Q3 = "Informe a quantidade que deseja inserir"
+        if not read_and_display_collection("saidas"):
+            input()
+            return
+        while True:
+            try:
+                print("\nPara sair da seção não digite nada e aperte Enter!")
+                codigo_venda_ifood: str = input(f"{Q1}\n")
+                if not codigo_venda_ifood:
+                    break
+                codigo_venda_ifood = int(codigo_venda_ifood)
+                saida_colletions: list = [x for x in self._saidas.find({"codigo_venda_ifood": codigo_venda_ifood})]
+                if not saida_colletions:
+                    raise ValueError
+            except ValueError:
+                input("\nO código informado não é valido. Por favor tente novamente.\n")
+                continue
+            for codigo, quantidade in saida_colletions[0]["codigos_item_saida"].items():
+                print(f"{codigo=} | {quantidade=}")
+            response_tuple = self.ask_for_multiple_input((Q2,int),(Q3,int))
+            if not response_tuple:
+                continue
+            codigo_item, quantidade = response_tuple
+            self._saidas.update_one({"codigo_venda_ifood": codigo_venda_ifood}, {"$set":{f"codigos_item_saida.{codigo_item}": quantidade}})
+            input("\nSaída alterada com sucesso!")
+            break
+
     def deletar_saidas(self):
         ...
 Estoque()
