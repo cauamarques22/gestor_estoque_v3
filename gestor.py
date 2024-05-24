@@ -77,7 +77,7 @@ def ask_for_multiple_input(*args: str) -> tuple | bool:
         response.append(r)
     return tuple(response)
 
-def display_options(*args: str) -> str:
+def display_options_to_user(*args: str) -> str:
     counter = 1
     print("Para sair do programa não digite nada e aperte Enter!")
     for msg in args:
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     while True:
         os.system("cls")
         print("Seja bem vindo ao sistema!")
-        user_input: str = display_options("Mostrar estoque","Cadastrar Estoque", "Saída do Estoque",\
+        user_input: str = display_options_to_user("Mostrar estoque","Cadastrar Estoque", "Saída do Estoque",\
                                     "Compra de Material","Informar Perdas")
 
         if not user_input: #Sair do programa
@@ -126,7 +126,7 @@ if __name__ == "__main__":
 
         elif user_input == "3": #Saída do estoque ()
             os.system("cls")
-            user_input: str = display_options("Criar saídas","Alterar saídas", "Deletar saídas","Histórico de saídas")
+            user_input: str = display_options_to_user("Criar saídas","Alterar saídas", "Deletar saídas","Histórico de saídas")
 
             if user_input == "1": #CRIAR SAÍDAS (OK)
                 user_multiple_input: tuple | bool = ask_for_multiple_input("Digite a data da saída", "Digite o Código da Venda do Ifood")
@@ -238,7 +238,7 @@ if __name__ == "__main__":
         elif user_input == "4": #Compra de material ()
             os.system("cls")
             print("Seção de cadastro de compra de material")
-            user_input: str = display_options("Cadastrar uma nova compra. (novo código de compra)", \
+            user_input: str = display_options_to_user("Cadastrar uma nova compra. (novo código de compra)", \
                                         "Acrescentar itens a uma compra existente", "Deletar compra",\
                                             "Ver histórico de compras")
             if not user_input:
