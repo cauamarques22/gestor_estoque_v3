@@ -1,4 +1,6 @@
 #Objetivo: pegar as funcionalidades do programa e transformar em classes.
+#Talves não seja tão interessante usar o paradigma OOP para esse programa, e sim FP. Pois aqui nesse código, eu não vou ficar criando multiplas instâncias
+#de classes, e sim reusar algumas funções
 from gestor import read_and_display_collection, get_latest_item_id
 from pymongo import MongoClient
 import os
@@ -92,7 +94,6 @@ class SaidaEstoque(GlobalFunctions):
     OP3: str = "Alterar saídas"
     OP4: str = "Deletar saídas"
     def __init__(self):
-        #mainloop
         self._saidas = gestor_ifood_db.saidas #conecta a collection saidas
         __user_response: str = self.display_options_to_user(self.OP1, self.OP2, self.OP3, self.OP4)
         if __user_response:
@@ -160,4 +161,5 @@ class SaidaEstoque(GlobalFunctions):
 
     def deletar_saidas(self):
         ...
+
 Estoque()
